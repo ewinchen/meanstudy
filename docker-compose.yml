@@ -1,7 +1,7 @@
 version: "3"
 services:
     web:
-        image: ewin/repository:todo-api
+        image: ewin/repository:todo-apii
         deploy:
             replicas: 3
             resources:
@@ -30,7 +30,7 @@ services:
         ports:
             - "27017:27017"
         volumes:
-            - ./data/db:/data/db
+            - /home/docker/mongodata/db:/data/db
         deploy:
             placement:
                 constraints: [node.role == manager]
