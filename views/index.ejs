@@ -1,128 +1,27 @@
-<!DOCTYPE html>
-<html ng-app="app">
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
+<!doctype html>
+<html>
+<head>
+    <script src="/javascripts/handsontable.full.min.js"></script>
+    <link rel="stylesheet" media="screen" href="/stylesheets/handsontable.full.min.css">
+</head>
+<body>
+    <div id="example"></div>
+</body>
+<script>
+    var data = [
+                ["", "Ford", "Volvo", "Toyota", "Honda"],
+                ["2016", 10, 11, 12, 13],
+                ["2017", 20, 11, 14, 13],
+                ["2018", 30, 15, 12, 13]
+            ];
 
-	<ng-view></ng-view>
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-resource.min.js"></script>
-	
-	<!-- Template -->
-	<script type="text/ng-template" id="/todos.html">
-		Search:<input type="text" ng-model="search.name">
-		<ul>
-			<li ng-repeat="todo in todos | filter: search">
-				<input type="checkbox" ng-model="todo.completed" ng-change="update($index)">
-				<a ng-show="!editing[$index]" href="#!/{{todo._id}}">{{todo.name}}</a>
-				<button ng-show="!editing[$index]" ng-click="edit($index)">edit</button>
-				<button ng-show="!editing[$index]" ng-click="remove($index)">remove</button>
-                <input ng-show="editing[$index]" type="text" ng-model="todo.name">
-				<button ng-show="editing[$index]" ng-click="update($index)">Update</button>
-				<button ng-show="editing[$index]" ng-click="cancle($index)">Cancle</button>
-			</li>
-		</ul>
-		New task <input type="text" ng-model="newTodo"><button ng-click="save()">Create</button>
-	</script>
-	
-	<script type="text/ng-template" id="/todoDetails.html">
-		<h1>{{ todo.name }}</h1>
-		completed: <input type="checkbox" ng-model="todo.completed"><br />
-		note: <textarea ng-model="todo.note"></textarea><br />
-		<button ng-click="remove()">Remove</button>
-		<button ng-click="update()">Update</button>
-		<a href="/">Cancel</a>
-	</script>
-	
-	<script>
-		angular.module('app', ['ngRoute', 'ngResource'])
-		
-		//Service
-		
-		.factory('Todos', ['$resource', function($resource){
-			return $resource('/todos/:id', null, {
-				'update': { method:'PUT'}
-			});
-		}])
-		
-		//Controllers
-		.controller('TodoController', ['$scope', 'Todos', function ($scope, Todos){
-			$scope.editing = [];
-			$scope.todos = Todos.query();
+    var container = document.getElementById('example');
+    var hot = new Handsontable(container, {
+        data: data,
+        rowHeaders: true,
+        colHeaders: true,
+        dropdownMenu: true
+    });  
+</script>  
+</html>  
 
-			$scope.save = function(){
-				if(!$scope.newTodo || $scope.newTodo.length<1) return;
-				var todo = new Todos({ name: $scope.newTodo, completed:false });
-
-				todo.$save(function(){
-					$scope.todos.push(todo);
-					$scope.newTodo = '';
-				});
-			}
-
-			$scope.update = function(index){
-				var todo = $scope.todos[index];
-				Todos.update({id: todo._id}, todo);
-				$scope.editing[index] = false;
-			}
-
-			$scope.edit = function(index) {
-				$scope.editing[index] = angular.copy($scope.todos[index]);
-			}
-
-			$scope.cancle = function(index) {
-				// $scope.todos[index] = angualr.copy($scope.editing[index]);
-				$scope.editing[index] = false;
-			}
-
-			$scope.remove = function(index){
-				var todo = $scope.todos[index];
-				Todos.remove({id: todo._id}, function(){
-					$scope.todos.splice(index, 1);
-				});
-			}
-		}])
-		
-		.controller('TodoDetailCtrl', ['$scope', '$routeParams', 'Todos', function($scope, $routeParams, Todos){
-			$scope.todo = Todos.get({id: $routeParams.id});
-
-			$scope.update = function(){
-				Todos.update({ id: $scope.todo._id }, $scope.todo, function(){
-					// alert(123);
-					document.location.href = '/';
-					// $location.url('/');
-				});
-			}
-
-			$scope.remove = function(){
-				Todos.remove({id: $scope.todo._id}, function(){
-					document.location.href = '/';
-				});
-			}
-		}])
-		
-		//Routes
-		
-		.config(['$routeProvider', function($routeProvider){
-			$routeProvider
-				.when('/', {
-					templateUrl: '/todos.html',
-					controller: 'TodoController'
-				})
-				.when('/:id', {
-					templateUrl: '/todoDetails.html',
-					controller: 'TodoDetailCtrl'
-				});
-		}]);
-		
-	
-	</script>
-	
-	
-  </body>
-</html>

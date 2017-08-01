@@ -1,0 +1,18 @@
+version: "3"
+services:
+    web:
+        image: ewin/repository:todo-apii
+        ports:
+            - "1000:3000"
+        networks:
+            - webnet
+    mongo:
+        image: mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - /home/docker/mongodata/db:/data/db
+        networks:
+            - webnet
+networks:
+    webnet:

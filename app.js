@@ -54,7 +54,7 @@ var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 //connect to MongoDB
-mongoose.connect('mongodb://localhost/todo-api')
+mongoose.connect('mongodb://192.168.99.100/todo-api')
   .then(() => console.log('connection succesful'))
   .catch((err) => console.error(err));
 
